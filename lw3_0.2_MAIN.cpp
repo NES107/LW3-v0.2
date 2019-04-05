@@ -21,7 +21,6 @@ struct results
     float fpointsm;
 };
 
-void openfile(struct results *results);
 void random(struct results *results);
 void mean(struct results *results);
 void median(struct results *results);
@@ -33,87 +32,81 @@ vector <results> students;
 results results;
 
 int path;
-cout<<"1 - manual mark input"<<endl<<"2 - random value generation"<<endl<<"3 - file output"<<endl;
+cout<<"1 - manual mark input/random value generation"<<endl<<"2 - file output"<<endl;
 cin>>path;
-
-if(path==1){
-char choice1='y';
-while(choice1!='n')
+int path1;
+if(path==1)
     {
-        cout<<"Enter surname: ";
-        cin>>results.surname;
-        cout<<"Enter name: ";
-        cin>>results.name;
+        cout<<"1 - manual mark input"<<endl<<"2 - random value generation"<<endl;
+        cin>>path1;
 
-        //else if(path==1)
-        {
-            char choice2 ='y';
-                while(choice2!='n')
+        char choice1='y';
+        while(choice1!='n')
+            {
+                cout<<"Enter surname: ";
+                cin>>results.surname;
+                cout<<"Enter name: ";
+                cin>>results.name;
+                if(path1==1)
                 {
-                    float hw;
-                    cout<<"Enter HW mark "<<results.hwm.size()+1<<": ";
-                    cin>>hw;
-                    results.hwm.push_back (hw);
-                    cout<<"Add mark (y/n)?: ";
-                    cin>>choice2;
+                    char choice2 ='y';
+                        while(choice2!='n')
+                        {
+                            float hw;
+                            cout<<"Enter HW mark "<<results.hwm.size()+1<<": ";
+                            cin>>hw;
+                            results.hwm.push_back (hw);
+                            cout<<"Add mark (y/n)?: ";
+                            cin>>choice2;
+                        }
+                    cout<<"Enter EXAM mark: ";
+                    cin>>results.examm;
+                    cout<<endl;
                 }
-            cout<<"Enter EXAM mark: ";
-            cin>>results.examm;
-            cout<<endl;
-        }
-        //else if(path==2)random(&results);
-        //else cout<<"Error in input"<<endl;
+                else if(path1==2)random(&results);
+                else cout<<"Error in input"<<endl;
 
-        mean(&results);
-        median(&results);
-
-        results.hwm.resize(0);
-        students.push_back (results);
-        cout<<"Add student "<<students.size()+1<<"(y/n)?: ";
-        cin>>choice1;
+                mean(&results);
+                median(&results);
+                results.hwm.resize(0);
+                students.push_back (results);
+                cout<<"Add student "<<students.size()+1<<"(y/n)?: ";
+                cin>>choice1;
+            }
     }
-}
-if(path==3)
+else if(path==2)
     {
-        for(int i=0;i<10;i++)
+        ifstream student_list;
+        student_list.open("student_list.txt");
+        if(!student_list.is_open())
         {
-        openfile(&results);
+            cerr<<"Error Opening File"<<endl;
+            exit(EXIT_FAILURE);
+        }
+        student_list.ignore( 1000, '\n' );
+        while(!student_list.eof())
+        {
+            student_list>>results.surname;
+            student_list>>results.name;
+            for(int i=0; i<5; i++)
+            {
+                float mark;
+                student_list>>mark;
+                results.hwm.push_back(mark);
+            }
+        student_list>>results.examm;
         mean(&results);
         median(&results);
         results.hwm.resize(0);
         students.push_back (results);
         }
-
+    student_list.close();
     }
+else cout<<"Error in input"<<endl;
+
 output(students);
 
 return 0;
-}
-
-void openfile(struct results *results)
-{
-    ifstream student_list;
-    student_list.open("student_list.txt");
-    if(!student_list.is_open())
-    {
-        cerr<<"Error Opening File"<<endl;
-        exit(EXIT_FAILURE);
-    }
-    student_list.ignore( 1000, '\n' );
-    while(!student_list.eof())
-    {
-        student_list>>results->surname;
-        student_list>>results->name;
-        for(int i=0; i<5; i++)
-        {
-            float mark;
-            student_list>>mark;
-            results->hwm.push_back(mark);
-        }
-    student_list>>results->examm;
-    student_list.close();
-    }
-
 }
 
 void random(struct results *results)
