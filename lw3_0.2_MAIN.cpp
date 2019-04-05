@@ -25,6 +25,7 @@ void openfile(struct results *results);
 void random(struct results *results);
 void mean(struct results *results);
 void median(struct results *results);
+void output(vector <results> students);
 
 int main()
 {
@@ -35,6 +36,7 @@ int path;
 cout<<"1 - manual mark input"<<endl<<"2 - random value generation"<<endl<<"3 - file output"<<endl;
 cin>>path;
 
+if(path==1){
 char choice1='y';
 while(choice1!='n')
     {
@@ -43,7 +45,7 @@ while(choice1!='n')
         cout<<"Enter name: ";
         cin>>results.name;
 
-        if(path==1)
+        //else if(path==1)
         {
             char choice2 ='y';
                 while(choice2!='n')
@@ -59,9 +61,8 @@ while(choice1!='n')
             cin>>results.examm;
             cout<<endl;
         }
-        else if(path==2)random(&results);
-        if(path==3)openfile(&results);
-        else cout<<"Error in input"<<endl;
+        //else if(path==2)random(&results);
+        //else cout<<"Error in input"<<endl;
 
         mean(&results);
         median(&results);
@@ -71,18 +72,48 @@ while(choice1!='n')
         cout<<"Add student "<<students.size()+1<<"(y/n)?: ";
         cin>>choice1;
     }
-
-cout<<endl<<"Surname"<<setw(15)<<cout.fill(' ')<<right<<"Name"<<setw(15)<<cout.fill(' ')<<right<<"Final points (Avg.)  /Final points (Med.)"<<endl;
-for(int i=0; i<82; i++)cout<<"-";
-cout<<endl;
-for(unsigned int i=0; i<students.size(); i++)
+}
+if(path==3)
     {
-        cout<<students[i].surname<<setw(15)<<cout.fill(' ')<<right<<students[i].name<<setw(15)<<cout.fill(' ')<<right;
-        printf("%.2f",students[i].fpointsa);
-        cout<<setw(15)<<cout.fill(' ')<<right;
-        printf("%.2f\n",students[i].fpointsm);
+        for(int i=0;i<10;i++)
+        {
+        openfile(&results);
+        mean(&results);
+        median(&results);
+        results.hwm.resize(0);
+        students.push_back (results);
+        }
+
     }
+output(students);
+
 return 0;
+}
+
+void openfile(struct results *results)
+{
+    ifstream student_list;
+    student_list.open("student_list.txt");
+    if(!student_list.is_open())
+    {
+        cerr<<"Error Opening File"<<endl;
+        exit(EXIT_FAILURE);
+    }
+    student_list.ignore( 1000, '\n' );
+    while(!student_list.eof())
+    {
+        student_list>>results->surname;
+        student_list>>results->name;
+        for(int i=0; i<5; i++)
+        {
+            float mark;
+            student_list>>mark;
+            results->hwm.push_back(mark);
+        }
+    student_list>>results->examm;
+    student_list.close();
+    }
+
 }
 
 void random(struct results *results)
@@ -108,27 +139,17 @@ void median(struct results *results)
     else results->fpointsm = 0.4*((results->hwm[results->hwm.size()/2-1] + results->hwm[results->hwm.size()/2])/2)+0.6*results->examm;
 }
 
-void openfile(struct results *results)
+void output(vector <results> students)
 {
-    ifstream student_list;
-    student_list.open("student_list.txt");
-    if(!student_list.is_open())
+    cout<<endl<<"Surname"<<setw(15)<<cout.fill(' ')<<right<<"Name"<<setw(15)<<cout.fill(' ')<<right<<"Final points (Avg.) / Final points (Med.)"<<endl;
+    for(int i=0; i<82; i++)cout<<"-";
+    cout<<endl;
+    for(unsigned int i=0; i<students.size(); i++)
     {
-        cerr<<"Error Opening File"<<endl;
-        exit(EXIT_FAILURE);
+        cout<<students[i].surname<<setw(22-students[i].surname.size())<<cout.fill(' ')<<right<<
+        students[i].name<<setw(26-students[i].name.size())<<cout.fill(' ')<<right;
+        printf("%.2f",students[i].fpointsa);
+        cout<<setw(18)<<cout.fill(' ')<<left;
+        printf("%.2f\n",students[i].fpointsm);
     }
-    student_list.ignore( 1000, '\n' );
-    while(!student_list.eof())
-    {
-        student_list>>results->surname;
-        student_list>>results->name;
-        for(int i=0; i<5; i++)
-        {
-            int mark;
-            student_list>>mark;
-            results->hwm.push_back(mark);
-        }
-        student_list>>results->examm;
-    }
-    student_list.close();
 }
